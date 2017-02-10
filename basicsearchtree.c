@@ -10,11 +10,11 @@ typedef struct tr_n_t {key_t      key;
                 struct tr_n_t  *right;
                /* possibly additional information */ } tree_node_t;
 
-typedef struct tree_node_t * text_t;
+typedef struct tr_n_t text_t;
 #define BLOCKSIZE 256
 
 tree_node_t *currentblock = NULL;
-int    size_left;
+int size_left;
 tree_node_t *free_list = NULL;
 int nodes_taken = 0;
 int nodes_returned = 0;
@@ -317,8 +317,14 @@ int main()
 // the main functions
 
 text_t * create_text() {
-  /* creates an empty text, whose length is 0. */
-  return NULL;
+  text_t *new_text;
+  new_text = get_node();
+  new_text->left = ( text_t *) ("\0");
+  new_text->key = -1;
+  //new_text->left->left = (text_t *)("\0");
+  //new_text->left->right = NULL;
+  //return( new_text );
+  return ( new_text );
 }
 int length_text( text_t *txt) {
   /* returns the number of lines of the current text. */
