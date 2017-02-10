@@ -4,10 +4,11 @@
 //This is my comment
 
 typedef int key_t;
-typedef int object_t;
+typedef char object_t;
 typedef struct tr_n_t {key_t      key; 
                 struct tr_n_t   *left;
                 struct tr_n_t  *right;
+                int height;
                /* possibly additional information */ } tree_node_t;
 
 typedef struct tr_n_t text_t;
@@ -86,42 +87,43 @@ object_t *find_recursive(tree_node_t *tree, key_t query_key)
 
 int insert(tree_node_t *tree, key_t new_key, object_t *new_object)
 {  tree_node_t *tmp_node;
+   /*
    if( tree->left == NULL )
    {  tree->left = (tree_node_t *) new_object;
       tree->key  = new_key;
       tree->right  = NULL; 
    }
-   else
+   */
    {  tmp_node = tree;
       while( tmp_node->right != NULL )
-      {   if( new_key < tmp_node->key )
+      {   if( new_key <= tmp_node->left->key )
                tmp_node = tmp_node->left;
-          else
+          else {
+               new_key = new_key - tmp_node->left->key;
                tmp_node = tmp_node->right;
+          }
       }
       /* found the candidate leaf. Test whether key distinct */
-      if( tmp_node->key == new_key )
-         return( -1 );
+ 
       /* key is distinct, now perform the insert */ 
-      {  tree_node_t *old_leaf, *new_leaf;
-         old_leaf = get_node();
-         old_leaf->left = tmp_node->left; 
-         old_leaf->key = tmp_node->key;
-         old_leaf->right  = NULL;
-         new_leaf = get_node();
-         new_leaf->left = (tree_node_t *) new_object; 
-         new_leaf->key = new_key;
-         new_leaf->right  = NULL; 
-         if( tmp_node->key < new_key )
-         {   tmp_node->left  = old_leaf;
-             tmp_node->right = new_leaf;
-             tmp_node->key = new_key;
-         } 
-         else
-         {   tmp_node->left  = new_leaf;
-             tmp_node->right = old_leaf;
-         } 
-      }
+      tree_node_t *old_leaf, *new_leaf;
+      old_leaf = get_node();
+      old_leaf->left = tmp_node->left; 
+      old_leaf->key = tmp_node->key;
+      old_leaf->right  = NULL;
+      new_leaf = get_node();
+      new_leaf->left = (tree_node_t *) new_object; 
+      new_leaf->key = new_key;
+      new_leaf->right  = NULL; 
+      if( tmp_node->key < new_key )
+      {   tmp_node->left  = old_leaf;
+          tmp_node->right = new_leaf;
+          tmp_node->key = new_key;
+      } 
+      else
+      {   tmp_node->left  = new_leaf;
+          tmp_node->right = old_leaf;
+      } 
    }
    return( 0 );
 }
@@ -239,7 +241,9 @@ void check_tree( tree_node_t *tr, int depth, int lower, int upper )
 }
 
 int main()
-{  tree_node_t *searchtree;
+{  
+   /*
+   tree_node_t *searchtree;
    char nextop;
    searchtree = create_tree();
    printf("Made Tree\n");
@@ -311,6 +315,7 @@ int main()
    printf("Removed tree.\n");
    printf("Total number of nodes taken %d, total number of nodes returned %d\n",
 	  nodes_taken, nodes_returned );
+   */
    return(0);
 }
 
@@ -351,7 +356,8 @@ char * get_line( text_t *txt, int index) {
 
 void append_line( text_t *txt, char * new_line) {
   /* appends new line as new last line. */
-  
+  insert(txt, txt->key, new_line);
+
 }
 
 char * set_line( text_t *txt, int index, char * new_line) {
@@ -359,7 +365,22 @@ char * set_line( text_t *txt, int index, char * new_line) {
     a line exists, to new line, and returns a pointer to the previous line of that number. If no line of
     that number exists, it does not change the structure and returns NULL.
   */
-  return NULL;
+    if (txt->key == 1 || index >= txt->key) {
+     return NULL;
+  }
+  text_t *temp = txt;
+  // later test and change to temp->key == 1 !!!!!!!!!!!!!!!! change to for ??
+  while (temp->right != NULL){
+      if (index > temp->left->key) {
+          index = index - temp->left->key;
+          temp = temp->right;
+      } else {
+          temp = temp->left;
+     }
+  }
+  char * old  = (char *) temp->left;
+  temp->left = (text_t *) new_line;
+  return old;
 }
 
 void insert_line( text_t *txt, int index, char * new_line) {
@@ -367,6 +388,10 @@ void insert_line( text_t *txt, int index, char * new_line) {
      number index, if such a line exists, to new line, renumbering all lines after that line. If no such
     line exists, it appends new line as new last line.
   */
+    if (index >= txt->key) {
+        append_line(txt, new_line);
+    }
+
 }
 
 char * delete_line( text_t *txt, int index) {
