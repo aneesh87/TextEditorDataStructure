@@ -1,6 +1,8 @@
 ﻿#include <stdio.h>
 #include <stdlib.h>
 
+//This is my comment
+
 typedef int key_t;
 typedef int object_t;
 typedef struct tr_n_t {key_t      key; 
