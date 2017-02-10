@@ -320,26 +320,38 @@ text_t * create_text() {
   text_t *new_text;
   new_text = get_node();
   new_text->left = ( text_t *) ("\0");
-  new_text->key = -1;
-  //new_text->left->left = (text_t *)("\0");
-  //new_text->left->right = NULL;
-  //return( new_text );
+  new_text->key = 1;
+  new_text->right = NULL;
   return ( new_text );
 }
 int length_text( text_t *txt) {
   /* returns the number of lines of the current text. */
-  return 0;
+   return (txt->key - 1); 
 }
 
 char * get_line( text_t *txt, int index) {
   /* gets the line of number index, if such a line exists, and
     returns NULL else.
   */
-  return NULL;
+  if (txt->key == 1 || index >= txt->key) {
+     return NULL;
+  }
+  text_t *temp = txt;
+  // later test and change to temp->key == 1 !!!!!!!!!!!!!!!! change to for ??
+  while (temp->right != NULL){
+      if (index > temp->left->key) {
+          index = index - temp->left->key;
+          temp = temp->right;
+      } else {
+          temp = temp->left;
+     }
+  }
+  return (char *) temp->left;
 }
 
 void append_line( text_t *txt, char * new_line) {
   /* appends new line as new last line. */
+  
 }
 
 char * set_line( text_t *txt, int index, char * new_line) {
