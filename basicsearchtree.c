@@ -83,7 +83,7 @@ void left_rotate (text_t * n)
 void insert(tree_node_t *tree, key_t new_key, object_t *new_object)
 {  
     int st_size = 200;
-    text_t ** stack = calloc(st_size, sizeof(text_t *));
+    text_t ** stack = (text_t **) calloc(st_size, sizeof(text_t *));
     tree_node_t *tmp_node;
     tmp_node = tree;
     int top = -1;
