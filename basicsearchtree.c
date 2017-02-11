@@ -3,6 +3,8 @@
 
 //This is my comment
 
+#define MAX(a,b) (a>b?a:b)
+
 typedef int key_t;
 typedef char object_t;
 typedef struct tr_n_t {key_t      key; 
@@ -84,6 +86,28 @@ object_t *find_recursive(tree_node_t *tree, key_t query_key)
    }
 }
 
+text_t * right_rotate (text_t * n) 
+{
+   text_t * x = n->left;
+   text_t * y = n->left->right;
+   x->right = n;
+   n->left = y;
+   n->height = 1 + MAX(n->left->height, n->right->height);
+   x->height = 1 + MAX(x->left->height, x->right->height);
+   return x;
+}
+
+text_t * left_rotate (text_t * n) 
+{
+   text_t * x = n->right;
+   text_t * y = n->right->left;
+   x->left = n;
+   n->right = y;
+   n->height = MAX(n->left->height, n->right->height) + 1;
+   x->height = MAX(x->left->height, x->right->height) + 1;
+   return x;
+}
+
 void insert(tree_node_t *tree, key_t new_key, object_t *new_object)
 {  
     tree_node_t *tmp_node;
@@ -110,7 +134,11 @@ void insert(tree_node_t *tree, key_t new_key, object_t *new_object)
     new_leaf->right  = NULL; 
     tmp_node->left  = new_leaf;
     tmp_node->right = old_leaf;
-    tmp_node->key  = 2; 
+    tmp_node->key  = 2;
+    //set the heights of the nodes
+    tmp_node->height = 1;
+    new_leaf->height = 0;
+    old_leaf->height = 0;
 }
 
 object_t *_delete(tree_node_t *tree, key_t delete_key)
@@ -131,10 +159,11 @@ object_t *_delete(tree_node_t *tree, key_t delete_key)
                  tmp_node   = upper_node->right; 
                  other_node = upper_node->left;
               } 
-       }
-       //upper_node->key   = 1;
-       printf("upper %d tmp %d other %d \n", upper_node->key, tmp_node->key, other_node->key);
-       printf("tmp obj %s\n", (char *)tmp_node->left);
+       } 
+       // upper_node->key   = 1;
+       // printf("upper %d tmp %d other %d \n", upper_node->key, tmp_node->key, other_node->key);
+       // printf("tmp obj %s\n", (char *)tmp_node->left);
+       
        upper_node->left  = other_node->left;
        upper_node->right = other_node->right;
        deleted_object = (object_t *) tmp_node->left;
@@ -302,6 +331,7 @@ text_t * create_text() {
   new_text->left = ( text_t *) ("\0");
   new_text->key = 1;
   new_text->right = NULL;
+  new_text->height = 0;
   return ( new_text );
 }
 int length_text( text_t *txt) {
@@ -317,7 +347,7 @@ char * get_line( text_t *txt, int index) {
   if (txt == NULL || txt->key == 1 || index >= txt->key) {
      return NULL;
   }
-  printf("root key is %d\n",txt->key);
+  printf("root height is %d key is %d\n",txt->height, txt->key);
   text_t *temp = txt;
   // later test and change to temp->key == 1 !!!!!!!!!!!!!!!! change to for ??
   while (temp->right != NULL){
