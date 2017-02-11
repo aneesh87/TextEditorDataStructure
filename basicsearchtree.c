@@ -117,41 +117,31 @@ void insert(tree_node_t *tree, key_t new_key, object_t *new_object)
 object_t *_delete(tree_node_t *tree, key_t delete_key)
 {  tree_node_t *tmp_node, *upper_node, *other_node;
    object_t *deleted_object;
-   if( tree->left == NULL )
-      return( NULL );
-   else if( tree->right == NULL )
-   {  if(  tree->key == delete_key )
-      {  deleted_object = (object_t *) tree->left;
-         tree->left = NULL;
-         return( deleted_object );
-      }
-      else
-         return( NULL );
-   }
-   else
-   {  tmp_node = tree;
-      while( tmp_node->right != NULL )
-      {   upper_node = tmp_node;
-          if( delete_key < tmp_node->key )
-          {  tmp_node   = upper_node->left; 
-             other_node = upper_node->right;
-          } 
-          else
-          {  tmp_node   = upper_node->right; 
-             other_node = upper_node->left;
-          } 
-      }
-      if( tmp_node->key != delete_key )
-         return( NULL );
-      else
-      {  upper_node->key   = other_node->key;
-         upper_node->left  = other_node->left;
-         upper_node->right = other_node->right;
-         deleted_object = (object_t *) tmp_node->left;
-         return_node( tmp_node );
-         return_node( other_node );
-         return( deleted_object );
-      }
+   if (tree->key == 1 || delete_key >= tree->key) {
+       return( NULL );
+   } else  {  
+       tmp_node = tree;
+       while (tmp_node->right != NULL ) {   
+             tmp_node->key = tmp_node->key - 1;
+             upper_node = tmp_node;
+             if( delete_key <= tmp_node->left->key ) {  
+                 tmp_node   = upper_node->left; 
+                 other_node = upper_node->right;
+              } else { 
+                 delete_key = delete_key - upper_node->left->key;
+                 tmp_node   = upper_node->right; 
+                 other_node = upper_node->left;
+              } 
+       }
+       //upper_node->key   = 1;
+       printf("upper %d tmp %d other %d \n", upper_node->key, tmp_node->key, other_node->key);
+       printf("tmp obj %s\n", (char *)tmp_node->left);
+       upper_node->left  = other_node->left;
+       upper_node->right = other_node->right;
+       deleted_object = (object_t *) tmp_node->left;
+       return_node( tmp_node );
+       return_node( other_node );
+       return( deleted_object );
    }
 }
 
