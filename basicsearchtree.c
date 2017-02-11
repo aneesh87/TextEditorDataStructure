@@ -85,7 +85,7 @@ object_t *find_recursive(tree_node_t *tree, key_t query_key)
    }
 }
 
-int insert(tree_node_t *tree, key_t new_key, object_t *new_object)
+void insert(tree_node_t *tree, key_t new_key, object_t *new_object)
 {  
     tree_node_t *tmp_node;
     tmp_node = tree;
@@ -112,7 +112,6 @@ int insert(tree_node_t *tree, key_t new_key, object_t *new_object)
     tmp_node->left  = new_leaf;
     tmp_node->right = old_leaf;
     tmp_node->key  = 2; 
-    return 0;
 }
 
 object_t *_delete(tree_node_t *tree, key_t delete_key)
@@ -245,7 +244,8 @@ int main()
        char *strobj;
        strobj = (char *) malloc(sizeof(char) * 100);
        scanf(" %d", &inskey);
-       scanf("%s", strobj);
+       fseek(stdin,0,SEEK_END);
+       scanf ("%[^\n]%*c", strobj);
        insert_line( searchtree, inskey, strobj );
        printf("  insert line successful, key = %d, object value = %s, \n",
         	  inskey, strobj);
@@ -324,6 +324,7 @@ char * get_line( text_t *txt, int index) {
   /* gets the line of number index, if such a line exists, and
     returns NULL else.
   */
+  printf("root key is %d\n",txt->key);
   if (txt->key == 1 || index >= txt->key) {
      return NULL;
   }
@@ -376,9 +377,9 @@ void insert_line( text_t *txt, int index, char * new_line) {
   */
     if (index >= txt->key) {
         append_line(txt, new_line);
+    } else {
+        insert(txt, index, new_line);
     }
-    insert(txt, index, new_line);
-
 }
 
 char * delete_line( text_t *txt, int index) {
