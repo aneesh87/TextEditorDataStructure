@@ -86,46 +86,33 @@ object_t *find_recursive(tree_node_t *tree, key_t query_key)
 }
 
 int insert(tree_node_t *tree, key_t new_key, object_t *new_object)
-{  tree_node_t *tmp_node;
-   /*
-   if( tree->left == NULL )
-   {  tree->left = (tree_node_t *) new_object;
-      tree->key  = new_key;
-      tree->right  = NULL; 
-   }
-   */
-   {  tmp_node = tree;
-      while( tmp_node->right != NULL )
-      {   if( new_key <= tmp_node->left->key )
+{  
+    tree_node_t *tmp_node;
+    tmp_node = tree;
+    while( tmp_node->right != NULL ) {   
+          tmp_node->key = tmp_node->key + 1;
+          if( new_key <= tmp_node->left->key ) {
                tmp_node = tmp_node->left;
-          else {
+          } else {               
                new_key = new_key - tmp_node->left->key;
                tmp_node = tmp_node->right;
           }
-      }
-      /* found the candidate leaf. Test whether key distinct */
- 
-      /* key is distinct, now perform the insert */ 
-      tree_node_t *old_leaf, *new_leaf;
-      old_leaf = get_node();
-      old_leaf->left = tmp_node->left; 
-      old_leaf->key = tmp_node->key;
-      old_leaf->right  = NULL;
-      new_leaf = get_node();
-      new_leaf->left = (tree_node_t *) new_object; 
-      new_leaf->key = new_key;
-      new_leaf->right  = NULL; 
-      if( tmp_node->key < new_key )
-      {   tmp_node->left  = old_leaf;
-          tmp_node->right = new_leaf;
-          tmp_node->key = new_key;
-      } 
-      else
-      {   tmp_node->left  = new_leaf;
-          tmp_node->right = old_leaf;
-      } 
-   }
-   return( 0 );
+    }
+    /* found the candidate leaf. Test whether key distinct */ 
+    /* key is distinct, now perform the insert */ 
+    tree_node_t *old_leaf, *new_leaf;
+    old_leaf = get_node();
+    old_leaf->left = tmp_node->left; 
+    old_leaf->key = tmp_node->key;
+    old_leaf->right  = NULL;
+    new_leaf = get_node();
+    new_leaf->left = (tree_node_t *) new_object; 
+    new_leaf->key = 1;
+    new_leaf->right  = NULL; 
+    tmp_node->left  = new_leaf;
+    tmp_node->right = old_leaf;
+    tmp_node->key  = 2; 
+    return 0;
 }
 
 object_t *_delete(tree_node_t *tree, key_t delete_key)
@@ -240,40 +227,39 @@ void check_tree( tree_node_t *tr, int depth, int lower, int upper )
    }
 }
 
+text_t * create_text();
+void insert_line( text_t *txt, int index, char * new_line);
+char * get_line( text_t *txt, int index);
+
 int main()
 {  
-   /*
+   
    tree_node_t *searchtree;
    char nextop;
-   searchtree = create_tree();
+   searchtree = create_text();
    printf("Made Tree\n");
    printf("In the following, the key n is associated wth the objecct 10n+2\n");
    while( (nextop = getchar())!= 'q' )
    { if( nextop == 'i' )
-     { int inskey,  *insobj, success;
-       insobj = (int *) malloc(sizeof(int));
+     { int inskey, success;
+       char *strobj;
+       strobj = (char *) malloc(sizeof(char) * 100);
        scanf(" %d", &inskey);
-       *insobj = 10*inskey+2;
-       success = insert( searchtree, inskey, insobj );
-       if ( success == 0 )
-         printf("  insert successful, key = %d, object value = %d, \n",
-        	  inskey, *insobj);
-       else
-           printf("  insert failed, success = %d\n", success);
+       scanf("%s", strobj);
+       insert_line( searchtree, inskey, strobj );
+       printf("  insert line successful, key = %d, object value = %s, \n",
+        	  inskey, strobj);
      }  
-     if( nextop == 'f' )
-     { int findkey, *findobj;
-       scanf(" %d", &findkey);
-       findobj = find_iterative( searchtree, findkey);
-       if( findobj == NULL )
-         printf("  find (iterative) failed, for key %d\n", findkey);
-       else
-         printf("  find (iterative) successful, found object %d\n", *findobj);
-       findobj = find_recursive( searchtree, findkey);
-       if( findobj == NULL )
-         printf("  find (recursive) failed, for key %d\n", findkey);
-       else
-         printf("  find (recursive) successful, found object %d\n", *findobj);
+     if(nextop == 'f' ) { 
+        int findkey;
+        char *findobj;
+        scanf(" %d", &findkey);
+        findobj = get_line( searchtree, findkey);
+        if(findobj == NULL) {
+           printf("  get line failed, for key %d\n", findkey);
+        } else {
+           printf("  get line successful, found object %s\n", findobj);
+        }
      }
      if( nextop == 'v' )
      { int a, b;  tree_node_t *results, *tmp;
@@ -293,13 +279,14 @@ int main()
        }
      }
      if( nextop == 'd' )
-     { int delkey, *delobj;
+     { int delkey;
+       char *delobj;
        scanf(" %d", &delkey);
        delobj = _delete( searchtree, delkey);
        if( delobj == NULL )
          printf("  delete failed for key %d\n", delkey);
        else
-         printf("  delete successful, deleted object %d for key %d\n", *delobj, delkey);
+         printf("  delete successful, deleted object %s for key %d\n", delobj, delkey);
      }
      if( nextop == '?' )
      {  printf("  Checking tree\n"); 
@@ -315,14 +302,13 @@ int main()
    printf("Removed tree.\n");
    printf("Total number of nodes taken %d, total number of nodes returned %d\n",
 	  nodes_taken, nodes_returned );
-   */
    return(0);
 }
 
 // the main functions
 
 text_t * create_text() {
-  text_t *new_text;
+  text_t * new_text;
   new_text = get_node();
   new_text->left = ( text_t *) ("\0");
   new_text->key = 1;
@@ -391,6 +377,7 @@ void insert_line( text_t *txt, int index, char * new_line) {
     if (index >= txt->key) {
         append_line(txt, new_line);
     }
+    insert(txt, index, new_line);
 
 }
 
