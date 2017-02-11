@@ -376,5 +376,6 @@ char * delete_line( text_t *txt, int index) {
   /* deletes the line of number index, renumbering all
     lines after that line, and returns a pointer to the deleted line.
   */
+  _delete(txt, index);
   return NULL;
 }
