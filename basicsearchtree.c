@@ -11,9 +11,8 @@ typedef struct tr_n_t {key_t      key;
                 int height;
                /* possibly additional information */ } tree_node_t;
 
+#define BLOCKSIZE 256            
 typedef struct tr_n_t text_t;
-#define BLOCKSIZE 256
-
 tree_node_t *currentblock = NULL;
 int size_left;
 tree_node_t *free_list = NULL;
@@ -307,6 +306,7 @@ text_t * create_text() {
 }
 int length_text( text_t *txt) {
   /* returns the number of lines of the current text. */
+   if (txt == NULL) return -1;
    return (txt->key - 1); 
 }
 
@@ -314,10 +314,10 @@ char * get_line( text_t *txt, int index) {
   /* gets the line of number index, if such a line exists, and
     returns NULL else.
   */
-  printf("root key is %d\n",txt->key);
-  if (txt->key == 1 || index >= txt->key) {
+  if (txt == NULL || txt->key == 1 || index >= txt->key) {
      return NULL;
   }
+  printf("root key is %d\n",txt->key);
   text_t *temp = txt;
   // later test and change to temp->key == 1 !!!!!!!!!!!!!!!! change to for ??
   while (temp->right != NULL){
@@ -333,6 +333,7 @@ char * get_line( text_t *txt, int index) {
 
 void append_line( text_t *txt, char * new_line) {
   /* appends new line as new last line. */
+  if (txt == NULL) return;
   insert(txt, txt->key, new_line);
 
 }
@@ -342,7 +343,7 @@ char * set_line( text_t *txt, int index, char * new_line) {
     a line exists, to new line, and returns a pointer to the previous line of that number. If no line of
     that number exists, it does not change the structure and returns NULL.
   */
-    if (txt->key == 1 || index >= txt->key) {
+    if (txt == NULL || txt->key == 1 || index >= txt->key) {
      return NULL;
   }
   text_t *temp = txt;
@@ -365,6 +366,7 @@ void insert_line( text_t *txt, int index, char * new_line) {
      number index, if such a line exists, to new line, renumbering all lines after that line. If no such
     line exists, it appends new line as new last line.
   */
+    if (txt == NULL) return;
     if (index >= txt->key) {
         append_line(txt, new_line);
     } else {
@@ -376,6 +378,7 @@ char * delete_line( text_t *txt, int index) {
   /* deletes the line of number index, renumbering all
     lines after that line, and returns a pointer to the deleted line.
   */
-  _delete(txt, index);
-  return NULL;
+  if (txt == NULL) return NULL;
+  
+  return _delete(txt, index);  
 }
