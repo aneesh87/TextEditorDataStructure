@@ -46,46 +46,6 @@ void return_node(tree_node_t *node)
    nodes_returned +=1;
 }
 
-tree_node_t *create_tree(void)
-{  tree_node_t *tmp_node;
-   tmp_node = get_node();
-   tmp_node->left = NULL;
-   return( tmp_node );
-}
-
-object_t *find_iterative(tree_node_t *tree, key_t query_key)
-{  tree_node_t *tmp_node;
-   if( tree->left == NULL )
-     return(NULL);
-   else
-   {  tmp_node = tree;
-      while( tmp_node->right != NULL )
-      {   if( query_key < tmp_node->key )
-               tmp_node = tmp_node->left;
-          else
-               tmp_node = tmp_node->right;
-      }
-      if( tmp_node->key == query_key )
-         return( (object_t *) tmp_node->left );
-      else
-         return( NULL );
-   }
-}
-
-object_t *find_recursive(tree_node_t *tree, key_t query_key)
-{  if( tree->left == NULL || 
-       (tree->right == NULL && tree->key != query_key ) )
-      return(NULL);
-   else if (tree->right == NULL && tree->key == query_key )
-      return( (object_t *) tree->left );     
-   else
-   {  if( query_key < tree->key )
-         return( find_recursive(tree->left, query_key) );
-      else
-         return( find_recursive(tree->right, query_key) );
-   }
-}
-
 void right_rotate (text_t * n) 
 {
 
@@ -242,53 +202,6 @@ void remove_tree(tree_node_t *tree)
    }
 }
 
-tree_node_t *interval_find(tree_node_t *tree, key_t a, key_t b)
-{  tree_node_t *tr_node;
-   tree_node_t *node_stack[200]; int stack_p = 0;
-   tree_node_t *result_list, *tmp, *tmp2;
-   result_list = NULL;
-   node_stack[stack_p++] = tree;
-   while( stack_p > 0 )
-   {  tr_node = node_stack[--stack_p];
-      if( tr_node->right == NULL )
-      {  /* reached leaf, now test */
-	 if( a <= tr_node->key && tr_node->key < b )
-         {  tmp = get_node();        /* leaf key in interval */
-            tmp->key  = tr_node->key; /* copy to output list */  
-	    tmp->left = tr_node->left;   
-            tmp->right = result_list;
-            result_list = tmp;
-         }
-      } /* not leaf, might have to follow down */
-      else if ( b <= tr_node->key ) /* entire interval left */
-         node_stack[stack_p++] = tr_node->left;
-      else if ( tr_node->key <= a ) /* entire interval right*/
-         node_stack[stack_p++] = tr_node->right;
-      else   /* node key in interval, follow left and right */
-      {  node_stack[stack_p++] = tr_node->left;
-         node_stack[stack_p++] = tr_node->right;
-      }
-   }
-   return( result_list );
-}
-
-void check_tree( tree_node_t *tr, int depth, int lower, int upper )
-{  if( tr->left == NULL )
-   {  printf("Tree Empty\n"); return; }
-   if( tr->key < lower || tr->key >= upper )
-         printf("Wrong Key Order \n");
-   if( tr->right == NULL )
-   {  if( *( (int *) tr->left) == 10*tr->key + 2 )
-         printf("%d(%d)  ", tr->key, depth );
-      else
-         printf("Wrong Object \n");
-   }
-   else
-   {  check_tree(tr->left, depth+1, lower, tr->key ); 
-      check_tree(tr->right, depth+1, tr->key, upper ); 
-   }
-}
-
 text_t * create_text();
 void insert_line( text_t *txt, int index, char * new_line);
 char * get_line( text_t *txt, int index);
@@ -324,23 +237,6 @@ int main()
            printf("  get line successful, found object %s\n", findobj);
         }
      }
-     if( nextop == 'v' )
-     { int a, b;  tree_node_t *results, *tmp;
-       scanf(" %d %d", &a, &b);
-       results = interval_find( searchtree, a, b );
-       if( results == NULL )
-          printf("  no keys found in the interval [%d,%d[\n", a, b);
-       else
-       {  printf("  the following keys found in the interval [%d,%d[\n", a, b);
-          while( results != NULL )
-	  {  printf("(%d,%d) ", results->key, *((int *) results->left) );
-             tmp = results;
-	     results = results->right;
-             return_node( tmp );
-          }
-          printf("\n");
-       }
-     }
      if( nextop == 'd' )
      { int delkey;
        char *delobj;
@@ -351,23 +247,13 @@ int main()
        else
          printf("  delete successful, deleted object %s for key %d\n", delobj, delkey);
      }
-     if( nextop == '?' )
-     {  printf("  Checking tree\n"); 
-        check_tree(searchtree,0,-1000,1000);
-        printf("\n");
-        if( searchtree->left != NULL )
- 	   printf("key in root is %d\n",	 searchtree->key );
-        printf("  Finished Checking tree\n"); 
-     }
    }
-
    remove_tree( searchtree );
    printf("Removed tree.\n");
    printf("Total number of nodes taken %d, total number of nodes returned %d\n",
 	  nodes_taken, nodes_returned );
    return(0);
 }
-
 // the main functions
 
 text_t * create_text() {
