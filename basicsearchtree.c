@@ -86,33 +86,54 @@ object_t *find_recursive(tree_node_t *tree, key_t query_key)
    }
 }
 
-text_t * right_rotate (text_t * n) 
+void right_rotate (text_t * n) 
 {
-   text_t * x = n->left;
-   text_t * y = n->left->right;
-   x->right = n;
-   n->left = y;
-   n->height = 1 + MAX(n->left->height, n->right->height);
+
+   text_t * tmp = n->right;
+   n->right = n->left;
+   n->left = n->left->left;
+   n->right->left = n->right->right;
+   n->right->right = tmp; 
+
+   text_t * x = n->right;
+   x->key = x->left->key + x->right->key;
    x->height = 1 + MAX(x->left->height, x->right->height);
-   return x;
+
+   n->key = n->left->key + n->right->key;
+   n->height = 1 + MAX(n->left->height, n->right->height);
 }
 
-text_t * left_rotate (text_t * n) 
+void left_rotate (text_t * n) 
 {
-   text_t * x = n->right;
-   text_t * y = n->right->left;
-   x->left = n;
-   n->right = y;
-   n->height = MAX(n->left->height, n->right->height) + 1;
-   x->height = MAX(x->left->height, x->right->height) + 1;
-   return x;
+   text_t * tmp = n->left;
+   n->left = n->right;
+   n->right = n->right->right;
+   n->left->right = n->left->left;
+   n->left->left = tmp; 
+
+   text_t * x = n->left;
+   x->key = x->left->key + x->right->key;
+   x->height = 1 + MAX(x->left->height, x->right->height);
+
+   n->key = n->left->key + n->right->key;
+   n->height = 1 + MAX(n->left->height, n->right->height);
+
 }
 
 void insert(tree_node_t *tree, key_t new_key, object_t *new_object)
 {  
+    int st_size = 200;
+    text_t ** stack = calloc(st_size, sizeof(text_t *));
     tree_node_t *tmp_node;
     tmp_node = tree;
-    while( tmp_node->right != NULL ) {   
+    int top = -1;
+    while( tmp_node->right != NULL ) {
+          if (top == st_size -1) {
+              // TODO: realloc ??
+              printf("Insert Failed due to Stack Overflow\n");
+              return;
+          }
+          stack[++top] = tmp_node;
           tmp_node->key = tmp_node->key + 1;
           if( new_key <= tmp_node->left->key ) {
                tmp_node = tmp_node->left;
@@ -139,6 +160,30 @@ void insert(tree_node_t *tree, key_t new_key, object_t *new_object)
     tmp_node->height = 1;
     new_leaf->height = 0;
     old_leaf->height = 0;
+    
+    while (top >= 0) { 
+        tmp_node = stack[top--];
+        int prev_height = tmp_node->height;
+        if (tmp_node->left->height - tmp_node->right->height == 2) { 
+            if(tmp_node->left->left->height == tmp_node->right->height + 1) { 
+              right_rotate(tmp_node);
+            } else { 
+              left_rotate(tmp_node->left);
+              right_rotate(tmp_node);
+            }
+        } else if(tmp_node->right->height - tmp_node->left->height == 2) { 
+                  if(tmp_node->right->right->height ==tmp_node->left->height + 1) { 
+                     left_rotate(tmp_node);
+                  } else { 
+                      right_rotate(tmp_node->right);
+                      left_rotate(tmp_node);
+                  }
+        } else { 
+               tmp_node->height = 1 + MAX(tmp_node->left->height, tmp_node->right->height);
+        }
+        if(tmp_node->height == prev_height) break;
+  }
+  free(stack);
 }
 
 object_t *_delete(tree_node_t *tree, key_t delete_key)
