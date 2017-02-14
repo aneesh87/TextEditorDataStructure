@@ -1,2 +1,2 @@
 all:
-	gcc basicsearchtree.c
+	g++ basicsearchtree.cc
