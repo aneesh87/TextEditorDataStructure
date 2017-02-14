@@ -201,7 +201,7 @@ void remove_tree(tree_node_t *tree)
       return_node( current_node );
    }
 }
-/*
+
 text_t * create_text();
 void insert_line( text_t *txt, int index, char * new_line);
 char * get_line( text_t *txt, int index);
@@ -255,7 +255,7 @@ int main()
    return(0);
 }
 
-*/
+
 // the main functions
 
 text_t * create_text() {
