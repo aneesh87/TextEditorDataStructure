@@ -7,14 +7,14 @@
 
 typedef int key_t;
 typedef char object_t;
-typedef struct tr_n_t {key_t      key; 
-                struct tr_n_t   *left;
-                struct tr_n_t  *right;
+typedef struct text_t {key_t      key; 
+                struct text_t   *left;
+                struct text_t  *right;
                 int height;
                /* possibly additional information */ } tree_node_t;
 
 #define BLOCKSIZE 256            
-typedef struct tr_n_t text_t;
+//  typedef struct text_t text_t;
 tree_node_t *currentblock = NULL;
 int size_left;
 tree_node_t *free_list = NULL;
@@ -201,7 +201,7 @@ void remove_tree(tree_node_t *tree)
       return_node( current_node );
    }
 }
-
+/*
 text_t * create_text();
 void insert_line( text_t *txt, int index, char * new_line);
 char * get_line( text_t *txt, int index);
@@ -224,7 +224,7 @@ int main()
        scanf ("%[^\n]%*c", strobj);
        insert_line( searchtree, inskey, strobj );
        printf("  insert line successful, key = %d, object value = %s, \n",
-        	  inskey, strobj);
+            inskey, strobj);
      }  
      if(nextop == 'f' ) { 
         int findkey;
@@ -251,9 +251,11 @@ int main()
    remove_tree( searchtree );
    printf("Removed tree.\n");
    printf("Total number of nodes taken %d, total number of nodes returned %d\n",
-	  nodes_taken, nodes_returned );
+    nodes_taken, nodes_returned );
    return(0);
 }
+
+*/
 // the main functions
 
 text_t * create_text() {
